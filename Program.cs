@@ -36,13 +36,18 @@ public class Program
         [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
         private static extern S ManagedConstructS (int i, int f);
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static unsafe S IndirectMaker(delegate *<int, int, S> ctor)
+        {
+                return ctor (123, 456);
+        }
 
         public static unsafe void Main()
         {
                 Console.WriteLine ("Before construct_it:");
 #if false
                 // works
-                S s = ManagedConstructS(123, 456);
+                S s = IndirectMaker (&ManagedConstructS);
 #else
                 // dies here
                 S s = construct_it (&ConstructS);
